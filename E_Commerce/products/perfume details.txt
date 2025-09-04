@@ -1,0 +1,105 @@
+from products.models import Product, Category, Seller
+from django.core.files import File
+
+# Fetch required foreign keys
+category = Category.objects.get(name="Perfumes")
+seller = Seller.objects.get(user__username="admin")  # adjust username as needed
+
+# Boss man pefume
+with open("C:\Users\exam2\Downloads\man perfume image.jpg", "rb") as img_file:
+    product1 = Product(
+        seller=seller,
+        name="HUGO BOSS MAN perfume",
+        description="""
+
+Brand	HUGO BOSS
+Item Form	Spray
+Item Volume	100 Millilitres
+Scent	Apple, Vanilla, Patchouli
+Special Feature	Travel Size"""
+
+   price=5999,
+        stock=25,
+        category=perfumes
+    )
+    product1.image.save("man perfume image.jpeg", File(img_file))
+    product1.save()
+
+# Boss woman perfume
+with open("C:\Users\exam2\Downloads\boss perfume image.jpg", "rb") as img_file:
+    product2 = Product(
+        seller=seller,
+        name="HUGO BOSS silk jasmine perfume",
+        description="""
+Bold jasmine with notes of clove, honey and vanilla
+1.6 fl. oz. (50 mL)
+Spray top
+COLLECTION SILK JAZMINE 50 ML - 58013877
+""",
+        price=4900,
+        stock=15,
+        category=category
+    )
+    product2.image.save("boss perfume image.jpg", File(img_file))
+    product2.save()
+
+# the man company perfume
+with open("C:\Users\exam2\Downloads\men perfume image.jpg", "rb") as img_file:
+    product3 = Product(
+        seller=seller,
+        name="THE MAN COMPANY destiny perfume",
+        description="""
+Crafted with the finest ingredients, this fragrance for men is the perfect gift for him. Embrace sophistication and allure with every spritz of this exquisite perfume. Indulge in the luxury of a signature scent that complements your style and confidence. Whether for a special occasion or everyday wear, The Man Company Destiny Perfume ensures you exude an aura of irresistible charm.
+
+Features:
+
+Long-Lasting Fragrance
+
+        price=999,
+        stock=20,
+        category=category
+    )
+    product3.image.save("men perfume image.jpg", File(img_file))
+    product3.save()
+
+
+# Boss woman perfume
+with open("C:\Users\exam2\Downloads\boss perfume image.jpg", "rb") as img_file:
+    product2 = Product(
+        seller=seller,
+        name="HUGO BOSS silk jasmine perfume",
+        description="""
+Bold jasmine with notes of clove, honey and vanilla
+1.6 fl. oz. (50 mL)
+Spray top
+COLLECTION SILK JAZMINE 50 ML - 58013877
+""",
+        price=4900,
+        stock=15,
+        category=category
+    )
+    product2.image.save("boss perfume image.jpg", File(img_file))
+    product2.save()
+
+
+# Bellavita perfume
+with open("C:\Users\exam2\Downloads\Bellevita perfume.jpg", "rb") as img_file:
+    product2 = Product(
+        seller=seller,
+        name="BELLAVITA perfume",
+        description="""
+Features:
+Long Lasting
+IFRA - Certified
+Imported Oils
+Made In India
+DATE Woman by Bella Vita Luxury is a celebration of love and romance. The perfume has top notes of Pink Pepper and Red Fruits. At its heart, lies the trio of Jasmine, Orange Blossom and Violet, perfect for a romantic date. The base notes are Moss, Musk and Powdery, balanced by the sweetness of Vanilla to create an unforgettable moment.
+
+""",
+        price=4900,
+        stock=15,
+        category=category
+    )
+    product2.image.save("boss perfume image.jpg", File(img_file))
+    product2.save()
+

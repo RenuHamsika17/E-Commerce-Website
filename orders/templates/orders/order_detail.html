@@ -1,0 +1,153 @@
+{% load static %}
+{% load math_filters %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trendigo | Order</title>
+  <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Noto+Sans:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+</head>
+
+<body class="bg-[#101323] text-white font-['Inter','Noto Sans',sans-serif] min-h-screen flex flex-col">
+
+<!-- Header -->
+<header class="bg-[#141933] py-4 shadow">
+  <div class="container mx-auto flex justify-between items-center px-6">
+    <div class="flex items-center text-2xl font-bold text-white gap-2">
+      <i class="fas fa-bag-shopping"></i>
+      <span>Trendigo</span>
+    </div>
+    <div class="flex gap-6 items-center">
+      <nav>
+        <ul class="flex space-x-6 text-white font-medium">
+          <li><a href="{% url 'home' %}" class="hover:text-gray-300">Home</a></li>
+          <li><a href="{% url 'categories' %}" class="hover:text-gray-300">Categories</a></li>
+          <li><a href="{% url 'products' %}" class="hover:text-gray-300">Products</a></li>
+          <li><a href="{% url 'about' %}" class="hover:text-gray-300">About</a></li>
+          <li><a href="{% url 'contact' %}" class="hover:text-gray-300">Contact</a></li>
+        </ul>
+      </nav>
+      <form method="get" action="#">
+        <input type="text" name="q" placeholder="Search" class="bg-[#21284a] text-white rounded-lg px-4 py-2 text-sm w-48 placeholder:text-[#8e99cc]" />
+      </form>
+      <a href="{% url 'cart' %}" class="bg-[#21284a] p-2 rounded-lg">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 256 256">
+          <path d="M222.14,58.87A8,8,0,0,0,216,56H54.68L49.79,29.14A16,16,0,0,0,34.05,16H16a8,8,0,0,0,0,16h18L59.56,172.29a24,24,0,0,0,5.33,11.27,28,28,0,1,0,44.4,8.44h45.42A27.75,27.75,0,0,0,152,204a28,28,0,1,0,28-28H83.17a8,8,0,0,1-7.87-6.57L72.13,152h116a24,24,0,0,0,23.61-19.71l12.16-66.86A8,8,0,0,0,222.14,58.87Z" />
+        </svg>
+      </a>
+      {% if user.is_authenticated %}
+        <a href="{% url 'dashboard' %}" class="text-white hover:underline">Dashboard</a>
+        <form method="post" action="{% url 'logout' %}" class="inline">{% csrf_token %}
+          <button type="submit" class="ml-4 text-red-400 hover:underline">Logout</button>
+        </form>
+      {% else %}
+        <a href="{% url 'login' %}" class="bg-[#607afb] px-4 py-2 rounded-lg text-sm font-bold hover:bg-[#4f67d4]">Login</a>
+      {% endif %}
+    </div>
+  </div>
+</header>
+
+<main class="container mx-auto px-6 py-12 flex-grow">
+  <div class="max-w-4xl mx-auto bg-[#1f243a] rounded-xl shadow-lg p-8 text-white">
+    <h1 class="text-3xl font-bold mb-4 flex items-center gap-2"><i class="fas fa-receipt"></i> Order #{{ order.id }}</h1>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 text-sm md:text-base">
+      <p><strong>Status:</strong> <span id="status-text">{{ order.status }}</span></p>
+      <p><strong>Date:</strong> {{ order.order_date|date:"F d, Y H:i" }}</p>
+      <p><strong>Total Items:</strong> {{ items|length }}</p>
+      <p><strong>Total Amount:</strong> ₹{{ order.total_price }}</p>
+    </div>
+
+    <h2 class="text-xl font-semibold mb-2 flex items-center gap-2"><i class="fas fa-box-open"></i> Items</h2>
+    <div class="overflow-x-auto">
+      <table class="min-w-full table-auto text-left text-sm bg-white text-gray-900 rounded-lg overflow-hidden">
+        <thead class="bg-gray-200 text-gray-700">
+          <tr>
+            <th class="p-2">Product</th>
+            <th class="p-2">Qty</th>
+            <th class="p-2">Price</th>
+            <th class="p-2">Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in items %}
+          <tr class="border-t">
+            <td class="p-2">{{ item.product.name }}</td>
+            <td class="p-2">{{ item.quantity }}</td>
+            <td class="p-2">₹{{ item.price_at_purchase }}</td>
+            <td class="p-2">₹{{ item.price_at_purchase|multiply:item.quantity|floatformat:2 }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="4" class="p-4 text-center text-red-500">No items found for this order.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Payment Method Section -->
+    {% if not order.payment_method %}
+    <div class="mt-8">
+      <h3 class="text-lg font-semibold mb-4"><i class="fas fa-credit-card"></i> Choose Payment Method</h3>
+      <form action="{% url 'confirm_payment' order.id %}" method="post" class="space-y-4" id="payment-form">
+        {% csrf_token %}
+        <label class="flex items-center gap-3">
+          <input type="radio" name="payment_method" value="COD" required class="accent-blue-600"> Cash on Delivery
+        </label>
+        <label class="flex items-center gap-3">
+          <input type="radio" name="payment_method" value="UPI" class="accent-blue-600"> UPI (Google Pay, PhonePe, etc.)
+        </label>
+        <label class="flex items-center gap-3">
+          <input type="radio" name="payment_method" value="Card" class="accent-blue-600" id="card-option"> Credit/Debit Card
+        </label>
+
+        <!-- Card Details -->
+        <div id="card-fields" class="grid grid-cols-1 sm:grid-cols-3 gap-4 hidden">
+          <input type="text" name="card_number" placeholder="Card Number" maxlength="16" class="text-black px-3 py-2 rounded" />
+          <input type="text" name="card_expiry" placeholder="MM/YY" maxlength="5" class="text-black px-3 py-2 rounded" />
+          <input type="text" name="card_cvv" placeholder="CVV" maxlength="3" class="text-black px-3 py-2 rounded" />
+        </div>
+
+        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md font-semibold w-full sm:w-auto">
+          ✅ Confirm Payment
+        </button>
+      </form>
+    </div>
+    {% else %}
+    <p class="mt-6 text-green-400 font-medium">✅ Payment via {{ order.payment_method }} confirmed.</p>
+    {% endif %}
+  </div>
+</main>
+
+<footer class="text-center py-6 border-t border-[#21284a] text-[#8e99cc] text-sm">
+  &copy; 2025 Trendigo. All rights reserved.
+</footer>
+
+<script>
+  document.getElementById("card-option").addEventListener("change", function () {
+    document.getElementById("card-fields").classList.remove("hidden");
+  });
+  document.querySelectorAll("input[name='payment_method']").forEach(input => {
+    if (input.value !== 'Card') {
+      input.addEventListener("change", () => document.getElementById("card-fields").classList.add("hidden"));
+    }
+  });
+
+  // Simulate status change
+  const statuses = ["Processing", "Placed", "Shipped", "Out for Delivery"];
+  let index = 0;
+  const statusEl = document.getElementById("status-text");
+  function updateStatus() {
+    if (index < statuses.length) {
+      statusEl.innerText = statuses[index];
+      index++;
+      setTimeout(updateStatus, 5000);
+    }
+  }
+  setTimeout(updateStatus, 5000);
+</script>
+
+</body>
+</html>

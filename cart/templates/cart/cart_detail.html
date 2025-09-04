@@ -1,0 +1,138 @@
+{% load static %}
+{% load cart_extras %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trendigo | Cart</title>
+  <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Noto+Sans:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+</head>
+
+<body class="bg-[#101323] text-white font-['Inter','Noto Sans',sans-serif] min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-[#141933] py-4 shadow">
+    <div class="container mx-auto flex flex-wrap justify-between items-center px-6 gap-y-4">
+      <div class="flex items-center text-2xl font-bold text-white gap-2">
+        <i class="fas fa-bag-shopping"></i>
+        <span>Trendigo</span>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-6">
+        <nav>
+          <ul class="flex space-x-6 text-white font-medium">
+            <li><a href="{% url 'home' %}" class="hover:text-gray-300">Home</a></li>
+            <li><a href="{% url 'categories' %}" class="hover:text-gray-300">Categories</a></li>
+            <li><a href="{% url 'products' %}" class="hover:text-gray-300">Products</a></li>
+            <li><a href="{% url 'about' %}" class="hover:text-gray-300">About</a></li>
+            <li><a href="{% url 'contact' %}" class="hover:text-gray-300">Contact</a></li>
+          </ul>
+        </nav>
+
+        <form action="#" method="get">
+          <input type="text" name="q" placeholder="Search"
+            class="bg-[#21284a] text-white rounded-lg px-4 py-2 text-sm w-48 placeholder:text-[#8e99cc]" />
+        </form>
+
+        <a href="{% url 'cart' %}" class="bg-[#21284a] p-2 rounded-lg">
+          <i class="fas fa-shopping-cart"></i>
+        </a>
+
+        <nav>
+          {% if user.is_authenticated %}
+            <a href="{% url 'dashboard' %}" class="text-white hover:underline">Dashboard</a>
+            <form method="post" action="{% url 'logout' %}" class="inline">
+              {% csrf_token %}
+              <button type="submit" class="ml-4 text-red-400 hover:underline">Logout</button>
+            </form>
+          {% else %}
+            <a href="{% url 'login' %}" class="bg-[#607afb] px-4 py-2 rounded-lg text-sm font-bold hover:bg-[#4f67d4]">
+              Login
+            </a>
+          {% endif %}
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-grow container mx-auto px-6 py-10">
+    <h1 class="text-3xl font-bold mb-8 text-center">🛒 Your Cart</h1>
+  
+    {% if cart.items.all %}
+      <div class="overflow-x-auto rounded-lg shadow-md">
+        <table class="w-full text-left border-collapse border border-gray-700">
+          <thead class="bg-[#1c223c] text-gray-300 text-sm uppercase">
+            <tr>
+              <th class="py-3 px-4">Product</th>
+              <th class="py-3 px-4">Price</th>
+              <th class="py-3 px-4">Quantity</th>
+              <th class="py-3 px-4">Subtotal</th>
+              <th class="py-3 px-4">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="bg-[#181c31] text-white">
+            {% for item in cart.items.all %}
+              <tr class="border-t border-gray-700 hover:bg-[#202538] transition">
+                <td class="p-4 font-medium">{{ item.product.name }}</td>
+                <td class="p-4">₹{{ item.price_at_purchase|floatformat:2 }}</td>
+                <td class="p-4">{{ item.quantity }}</td>
+                <td class="p-4 font-semibold">₹{{ item.subtotal|floatformat:2 }}</td>
+                <td class="p-4 space-y-2">
+                  <form method="post" action="{% url 'update_quantity' item.id %}" class="flex items-center space-x-2">
+                    {% csrf_token %}
+                    <input type="number" name="quantity" value="{{ item.quantity }}" min="1"
+                      class="w-16 text-black rounded px-2 py-1" />
+                    <button type="submit"
+                      class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm">Update</button>
+                  </form>
+  
+                  <form method="post" action="{% url 'cart_remove' item.id %}">
+                    {% csrf_token %}
+                    <button type="submit"
+                      class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm w-full">
+                      Remove
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+  
+      <div class="flex flex-col md:flex-row justify-between items-center mt-10 gap-6 text-white">
+        <a href="{% url 'home' %}"
+          class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition">
+          ← Continue Shopping
+        </a>
+  
+        <div class="text-2xl font-semibold">
+          Total: ₹{{ cart.total_price|floatformat:2 }}
+        </div>
+  
+        <form method="post" action="{% url 'place_order' %}">
+          {% csrf_token %}
+          <button type="submit"
+            class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-lg transition">
+            ✅ Place Order
+          </button>
+        </form>
+      </div>
+    {% else %}
+      <div class="text-center text-gray-400 text-lg py-16">
+        Your cart is empty. <br />
+        <a href="{% url 'products' %}" class="text-blue-400 hover:underline">Go to Products</a>
+      </div>
+    {% endif %}
+  </main>
+
+  <!-- Footer -->
+  <footer class="mt-auto text-center py-6 border-t border-[#21284a] text-[#8e99cc] text-sm">
+    &copy; 2025 Trendigo. All rights reserved.
+  </footer>
+</body>
+</html>

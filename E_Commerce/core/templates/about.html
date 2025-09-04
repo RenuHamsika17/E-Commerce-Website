@@ -1,0 +1,127 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About Us - Trendigo</title>
+  <link rel="icon" href="{% static 'images/favicon.ico' %}" />
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-[#101323] text-white min-h-screen flex flex-col">
+
+<!-- Header -->
+<header class="bg-[#141933] py-4 shadow">
+  <div class="container mx-auto flex flex-wrap justify-between items-center px-6 gap-y-4">
+    
+    <!-- Logo -->
+    <div class="flex items-center text-2xl font-bold text-white gap-2">
+      <i class="fas fa-bag-shopping"></i>
+      <span>Trendigo</span>
+    </div>
+
+    <!-- Navigation + Search + Icons -->
+    <div class="flex flex-wrap items-center gap-6">
+
+      <!-- Navigation -->
+      <nav>
+        <ul class="flex space-x-6 text-white font-medium">
+          <li><a href="{% url 'home' %}" class="hover:text-gray-300">Home</a></li>
+          <li><a href="{% url 'categories' %}" class="hover:text-gray-300">Categories</a></li>
+          <li><a href="#" class="hover:text-gray-300">Products</a></li>
+          <li><a href="{% url 'about' %}" class="hover:text-gray-300">About</a></li>
+          <li><a href="{% url 'contact' %}" class="hover:text-gray-300">Contact</a></li>
+        </ul>
+      </nav>
+
+      <!-- Search -->
+      <form action="#" method="get">
+        <input
+          type="text"
+          name="q"
+          placeholder="Search"
+          class="bg-[#21284a] text-white rounded-lg px-4 py-2 text-sm w-48 placeholder:text-[#8e99cc]"
+        />
+      </form>
+
+      <!-- Cart Icon -->
+      <a href="#" class="bg-[#21284a] p-2 rounded-lg">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 256 256">
+          <path d="M222.14,58.87A8,8,0,0,0,216,56H54.68L49.79,29.14A16,16,0,0,0,34.05,16H16a8,8,0,0,0,0,16h18L59.56,172.29a24,24,0,0,0,5.33,11.27,28,28,0,1,0,44.4,8.44h45.42A27.75,27.75,0,0,0,152,204a28,28,0,1,0,28-28H83.17a8,8,0,0,1-7.87-6.57L72.13,152h116a24,24,0,0,0,23.61-19.71l12.16-66.86A8,8,0,0,0,222.14,58.87Z" />
+        </svg>
+      </a>
+      <!-- Login Button -->
+      <a href="{% url 'login' %}" class="bg-[#607afb] px-4 py-2 rounded-lg text-sm font-bold hover:bg-[#4f67d4]">
+        Login
+      </a>
+    </div>
+  </div>
+</header>
+
+
+<!-- About Section -->
+<section class="px-6 md:px-16 py-16 text-center">
+  <h2 class="text-4xl font-bold mb-4">About Trendigo</h2>
+  <p class="text-[#8e99cc] max-w-3xl mx-auto text-lg mb-8">
+    At Trendigo, we believe shopping should be effortless, affordable, and exciting. We're on a mission to bring you the latest in fashion, electronics, and lifestyle essentials — all curated with care and shipped fast.
+  </p>
+
+  <div class="grid md:grid-cols-3 gap-8 text-left mt-12">
+    <div class="bg-[#1a1f39] rounded-lg p-6">
+      <h3 class="text-xl font-semibold mb-2">Who We Are</h3>
+      <p class="text-[#cdd4f2] text-sm">
+        Trendigo is a next-gen eCommerce brand focused on delivering quality products with unbeatable convenience. We're a team of dreamers, doers, and technologists.
+      </p>
+    </div>
+    <div class="bg-[#1a1f39] rounded-lg p-6">
+      <h3 class="text-xl font-semibold mb-2">Our Mission</h3>
+      <p class="text-[#cdd4f2] text-sm">
+        Our mission is to make online shopping delightful. We aim to offer trendy, reliable, and affordable products while ensuring the best customer experience.
+      </p>
+    </div>
+    <div class="bg-[#1a1f39] rounded-lg p-6">
+      <h3 class="text-xl font-semibold mb-2">What We Offer</h3>
+      <p class="text-[#cdd4f2] text-sm">
+        From gadgets to wearables, from everyday staples to stylish exclusives — we bring it all to your fingertips with fast shipping and responsive support.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Team Section -->
+<section class="px-6 md:px-16 py-12">
+  <h3 class="text-2xl font-bold mb-6 text-center">Meet the Team</h3>
+  <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-6 text-center">
+    <div>
+      <img src="{% static 'images/team1.jpeg' %}" class="rounded-full mx-auto w-24 h-24 object-cover mb-2" alt="Team Member 1">
+      <p class="font-semibold">Alex Rana</p>
+      <p class="text-[#8e99cc] text-sm">Founder & CEO</p>
+    </div>
+    <div>
+      <img src="{% static 'images/team2.jpeg' %}" class="rounded-full mx-auto w-24 h-24 object-cover mb-2" alt="Team Member 2">
+      <p class="font-semibold">Meera Jain</p>
+      <p class="text-[#8e99cc] text-sm">Head of Marketing</p>
+    </div>
+    <div>
+      <img src="{% static 'images/team3.jpeg' %}" class="rounded-full mx-auto w-24 h-24 object-cover mb-2" alt="Team Member 3">
+      <p class="font-semibold">Ravi Kumar</p>
+      <p class="text-[#8e99cc] text-sm">Lead Developer</p>
+    </div>
+    <div>
+      <img src="{% static 'images/team4.jpeg' %}" class="rounded-full mx-auto w-24 h-24 object-cover mb-2" alt="Team Member 4">
+      <p class="font-semibold">Sara Patel</p>
+      <p class="text-[#8e99cc] text-sm">Customer Success</p>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="mt-auto text-center py-6 border-t border-[#21284a] text-[#8e99cc] text-sm">
+  &copy; 2025 Trendigo. All rights reserved.
+</footer>
+
+</body>
+</html>

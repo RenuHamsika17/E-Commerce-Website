@@ -1,0 +1,218 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>{{ product.name }} | Trendigo</title>
+  <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Noto+Sans:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+</head>
+<body class="bg-[#101323] text-white font-['Inter','Noto Sans',sans-serif] min-h-screen flex flex-col">
+
+<!-- Header -->
+<header class="bg-[#141933] py-4 shadow">
+  <div class="container mx-auto flex flex-wrap justify-between items-center px-6 gap-y-4">
+    <div class="flex items-center text-2xl font-bold text-white gap-2">
+      <i class="fas fa-bag-shopping"></i>
+      <span>Trendigo</span>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-6">
+      <nav>
+        <ul class="flex space-x-6 text-white font-medium">
+          <li><a href="{% url 'home' %}" class="hover:text-gray-300">Home</a></li>
+          <li><a href="{% url 'categories' %}" class="hover:text-gray-300">Categories</a></li>
+          <li><a href="{% url 'products' %}" class="hover:text-gray-300">Products</a></li>
+          <li><a href="{% url 'about' %}" class="hover:text-gray-300">About</a></li>
+          <li><a href="{% url 'contact' %}" class="hover:text-gray-300">Contact</a></li>
+        </ul>
+      </nav>
+
+      <form action="#" method="get">
+        <input type="text" name="q" placeholder="Search"
+          class="bg-[#21284a] text-white rounded-lg px-4 py-2 text-sm w-48 placeholder:text-[#8e99cc]" />
+      </form>
+
+      <a href="{% url 'cart' %}" class="bg-[#21284a] p-2 rounded-lg">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 256 256">
+          <path d="M222.14,58.87A8,8,0,0,0,216,56H54.68L49.79,29.14A16,16,0,0,0,34.05,16H16a8,8,0,0,0,0,16h18L59.56,172.29a24,24,0,0,0,5.33,11.27,28,28,0,1,0,44.4,8.44h45.42A27.75,27.75,0,0,0,152,204a28,28,0,1,0,28-28H83.17a8,8,0,0,1-7.87-6.57L72.13,152h116a24,24,0,0,0,23.61-19.71l12.16-66.86A8,8,0,0,0,222.14,58.87Z" />
+        </svg>
+      </a>
+
+      <nav>
+        {% if user.is_authenticated %}
+          <a href="{% url 'dashboard' %}" class="text-white hover:underline">Dashboard</a>
+          <form method="post" action="{% url 'logout' %}" class="inline">
+            {% csrf_token %}
+            <button type="submit" class="ml-4 text-red-400 hover:underline">Logout</button>
+          </form>
+        {% else %}
+          <a href="{% url 'login' %}" class="bg-[#607afb] px-4 py-2 rounded-lg text-sm font-bold hover:bg-[#4f67d4]">
+            Login
+          </a>
+        {% endif %}
+      </nav>
+    </div>
+  </div>
+</header>
+
+<!-- Dashboard Content -->
+<main class="container mx-auto px-4 sm:px-6 py-12 flex-grow">
+  <div class="max-w-3xl mx-auto bg-[#1e293b]/80 backdrop-blur-md p-8 rounded-2xl shadow-2xl space-y-8 border border-[#334155]/40">
+
+    <h2 class="text-3xl sm:text-4xl font-extrabold text-center text-white tracking-wide">
+      👋 Welcome, <span class="text-blue-400">{{ user.first_name }}</span>
+    </h2>
+
+    {% if user.is_customer %}
+      {% if profile %}
+        <section class="bg-[#334155]/60 p-6 rounded-xl text-white space-y-2 shadow-inner">
+          <h3 class="text-xl font-semibold text-blue-400 flex items-center gap-2">
+            <i class="fa-solid fa-id-card"></i> Customer Details
+          </h3>
+          <p><i class="fa-solid fa-envelope text-blue-300 mr-2"></i><strong>Email:</strong> {{ user.email }}</p>
+          <p><i class="fa-solid fa-phone text-pink-400 mr-2"></i><strong>Phone:</strong> {{ customer.phone_no }}</p>
+          <p><i class="fa-solid fa-house text-yellow-300 mr-2"></i><strong>Address:</strong> {{ customer.address }}</p>
+        </section>
+
+        <div class="text-center">
+          <a href="{% url 'edit_profile' %}" class="inline-block bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-2 rounded-lg font-semibold mt-4 shadow-lg">
+            ✏️ Edit Profile
+          </a>
+        </div>
+
+        <div>
+          <h3 class="text-2xl font-bold text-center text-white mt-10 mb-4 flex items-center justify-center gap-2">
+            📦 Your Orders
+          </h3>
+
+          {% if orders %}
+            <div class="space-y-4">
+              {% for order in orders %}
+              <div class="bg-white text-gray-900 p-5 rounded-lg shadow-lg border-l-4 border-blue-400 transition hover:scale-[1.01] duration-300">
+                <p class="font-semibold"><strong>Order ID:</strong> #{{ order.id }}</p>
+                <p><strong>Date:</strong> {{ order.order_date|date:"F d, Y H:i" }}</p>
+                <p>
+                  <strong>Status:</strong>
+                  <span id="status-text-{{ order.id }}" class="inline-block px-2 py-1 rounded text-sm font-medium
+                    {% if order.status == 'Processing' %} bg-blue-100 text-blue-800
+                    {% elif order.status == 'Placed' %} bg-yellow-100 text-yellow-800
+                    {% elif order.status == 'Shipped' %} bg-purple-100 text-purple-800
+                    {% elif order.status == 'Out for Delivery' %} bg-green-100 text-green-800
+                    {% else %} bg-gray-200 text-gray-800 {% endif %}">
+                    {{ order.status }}
+                  </span>
+                </p>
+                <p><strong>Total:</strong> ₹{{ order.total_price }}</p>
+                <a href="{% url 'order_detail' order.id %}" class="text-blue-600 hover:underline mt-2 inline-block">
+                  🔍 View Details
+                </a>
+              </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <p class="text-center text-gray-400 italic">You haven't placed any orders yet.</p>
+          {% endif %}
+        </div>
+      {% endif %}
+    {% elif user.is_seller %}
+      {% if profile %}
+        <section class="bg-[#334155]/60 p-6 rounded-xl text-white space-y-2 shadow-inner">
+          <h3 class="text-xl font-semibold text-blue-400 flex items-center gap-2">
+            <i class="fa-solid fa-store"></i> Seller Details
+          </h3>
+          <p><i class="fa-solid fa-envelope text-blue-300 mr-2"></i><strong>Email:</strong> {{ user.email }}</p>
+          <p><i class="fa-solid fa-phone text-pink-400 mr-2"></i><strong>Phone:</strong> {{ profile.phone_no }}</p>
+          <p><i class="fa-solid fa-location-dot text-yellow-300 mr-2"></i><strong>Shop Address:</strong> {{ profile.shop_name }}</p>
+        </section>
+        <div class="flex justify-center gap-6 mt-6">
+          <a href="{% url 'add_product' %}" class="bg-green-600 hover:bg-green-700 px-6 py-2 rounded-lg font-semibold shadow-lg text-white">
+            ➕ Add Product
+          </a>
+          <a href="{% url 'edit_profile' %}" class="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-lg font-semibold shadow-lg text-white">
+            ✏️ Edit Profile
+          </a>
+        </div>
+        <div>
+          <h3 class="text-2xl font-bold text-center text-white mt-10 mb-4 flex items-center justify-center gap-2">
+            📬 Orders for Your Products
+          </h3>
+
+          {% if seller_orders %}
+            <div class="space-y-4">
+              {% for item in seller_orders %}
+              <div class="bg-white text-gray-900 p-5 rounded-lg shadow-lg border-l-4 border-green-400 transition hover:scale-[1.01] duration-300">
+                <p><strong>Order ID:</strong> #{{ item.order.id }}</p>
+                <p><strong>Customer:</strong> {{ item.order.customer.first_name }} ({{ item.order.customer.email }})</p>
+                <p><strong>Product:</strong> {{ item.product.name }}</p>
+                <p><strong>Quantity:</strong> {{ item.quantity }}</p>
+                <p><strong>Ordered on:</strong> {{ item.order.order_date|date:"F d, Y H:i" }}</p>
+                <p><strong>Status:</strong> 
+                  <span class="inline-block px-2 py-1 rounded text-sm font-medium
+                    {% if item.order.status == 'Processing' %} bg-blue-100 text-blue-800
+                    {% elif item.order.status == 'Placed' %} bg-yellow-100 text-yellow-800
+                    {% elif item.order.status == 'Shipped' %} bg-purple-100 text-purple-800
+                    {% elif item.order.status == 'Out for Delivery' %} bg-green-100 text-green-800
+                    {% else %} bg-gray-200 text-gray-800 {% endif %}">
+                    {{ item.order.status }}
+                  </span>
+                </p>
+              </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <p class="text-center text-gray-400 italic">No orders for your products yet.</p>
+          {% endif %}
+        </div>
+        <div>
+          <h3 class="text-2xl font-bold text-center text-white mt-10 mb-4 flex items-center justify-center gap-2">
+            📦 Your Products
+          </h3>
+          
+          <div class="grid gap-6 md:grid-cols-2">
+            {% for product in seller_products %}
+              <div class="bg-[#1e293b] border border-[#334155] rounded-2xl p-5 shadow-xl hover:shadow-blue-500/20 transition-transform transform hover:scale-[1.02]">
+                <h4 class="text-xl font-bold text-white mb-3">{{ product.name }}</h4>
+          
+                {% if product.image %}
+                  <div class="w-full aspect-[4/3] overflow-hidden rounded-xl mb-4 bg-[#0f172a] flex items-center justify-center">
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="max-h-full max-w-full object-contain rounded-xl transition-transform duration-300 hover:scale-105">
+                  </div>
+                {% else %}
+                  <div class="w-full aspect-[4/3] rounded-xl mb-4 bg-[#0f172a] flex items-center justify-center text-gray-400 text-sm italic">
+                    No Image Available
+                  </div>
+                {% endif %}
+          
+                <ul class="text-sm text-gray-300 space-y-1 mb-4">
+                  <li><strong class="text-white">Price:</strong> ₹{{ product.price }}</li>
+                  <li><strong class="text-white">Stock:</strong> {{ product.stock }}</li>
+                  <li><strong class="text-white">Category:</strong> {{ product.category.name }}</li>
+                </ul>
+          
+                <a href="{% url 'product_detail' product.id %}" class="inline-flex items-center text-blue-400 hover:text-blue-300 font-medium text-sm transition duration-200">
+                  <i class="fa-solid fa-magnifying-glass mr-2"></i> View Details
+                </a>
+              </div>
+            {% empty %}
+              <p class="text-center text-gray-400 italic">You haven't posted any products yet.</p>
+            {% endfor %}
+          </div>
+          {% endif %}  
+    {% endif %}
+  </div>
+</main>
+
+
+
+<!-- Footer -->
+<footer class="mt-auto text-center py-6 border-t border-[#21284a] text-[#8e99cc] text-sm">
+  &copy; 2025 Trendigo. All rights reserved.
+</footer>
+
+</body>
+</html>

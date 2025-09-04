@@ -1,0 +1,121 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trendigo | Home</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}" />
+
+    <!-- Fonts and Tailwind -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Noto+Sans:wght@400;500;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    
+  </head>
+  <body class="bg-[#101323] text-white font-['Inter','Noto Sans',sans-serif] min-h-screen flex flex-col">
+    <!-- Header -->
+<!-- Header -->
+<header class="bg-[#141933] py-4 shadow">
+  <div class="container mx-auto flex flex-wrap justify-between items-center px-6 gap-y-4">
+    
+    <!-- Logo -->
+    <div class="flex items-center text-2xl font-bold text-white gap-2">
+      <i class="fas fa-bag-shopping"></i>
+      <span>Trendigo</span>
+    </div>
+
+    <!-- Navigation + Search + Icons -->
+    <div class="flex flex-wrap items-center gap-6">
+
+      <!-- Navigation -->
+      <nav>
+        <ul class="flex space-x-6 text-white font-medium">
+          <li><a href="{% url 'home' %}" class="hover:text-gray-300">Home</a></li>
+          <li><a href="{% url 'categories' %}" class="hover:text-gray-300">Categories</a></li>
+          <li><a href="{% url 'products' %}" class="hover:text-gray-300">Products</a></li>
+          <li><a href="{% url 'about' %}" class="hover:text-gray-300">About</a></li>
+          <li><a href="{% url 'contact' %}" class="hover:text-gray-300">Contact</a></li>
+        </ul>
+      </nav>
+
+      <!-- Search -->
+      <form action="#" method="get">
+        <input
+          type="text"
+          name="q"
+          placeholder="Search"
+          class="bg-[#21284a] text-white rounded-lg px-4 py-2 text-sm w-48 placeholder:text-[#8e99cc]"
+        />
+      </form>
+
+      <!-- Cart Icon -->
+      <a href="{% url 'cart' %}" class="bg-[#21284a] p-2 rounded-lg">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 256 256">
+          <path d="M222.14,58.87A8,8,0,0,0,216,56H54.68L49.79,29.14A16,16,0,0,0,34.05,16H16a8,8,0,0,0,0,16h18L59.56,172.29a24,24,0,0,0,5.33,11.27,28,28,0,1,0,44.4,8.44h45.42A27.75,27.75,0,0,0,152,204a28,28,0,1,0,28-28H83.17a8,8,0,0,1-7.87-6.57L72.13,152h116a24,24,0,0,0,23.61-19.71l12.16-66.86A8,8,0,0,0,222.14,58.87Z" />
+        </svg>
+      </a>
+
+      <!-- Login Button -->
+      <nav>
+        {% if user.is_authenticated %}
+          <a href="{% url 'dashboard' %}" class="text-white hover:underline">Dashboard</a>
+          <form method="post" action="{% url 'logout' %}" class="inline">
+            {% csrf_token %}
+            <button type="submit" class="ml-4 text-red-400 hover:underline">Logout</button>
+          </form>
+        {% else %}
+        <a href="{% url 'login' %}" class="bg-[#607afb] px-4 py-2 rounded-lg text-sm font-bold hover:bg-[#4f67d4]">
+          Login
+        </a>
+        {% endif %}
+      </nav>
+    </div>
+  </div>
+</header>
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+  <h2 class="text-3xl font-bold text-center text-white mb-8">All Products</h2>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    {% for product in products %}
+      <div class="bg-[#1e1f38] rounded-lg shadow-lg overflow-hidden p-4 flex flex-col items-center">
+        {% if product.image %}
+          <img src="{{ product.image.url }}" alt="{{ product.name }}" class="h-48 w-full object-contain mb-4 rounded-md bg-[#21284a]">
+        {% else %}
+          <img src="{% static 'images/default-product.jpg' %}" alt="No Image" class="h-48 w-full object-contain mb-4 rounded-md bg-[#21284a]">
+        {% endif %}
+        
+        <h3 class="text-lg font-semibold text-white mb-1 text-center">{{ product.name }}</h3>
+        <p class="text-[#8ab4f8] font-medium mb-4">${{ product.price }}</p>
+        
+        <div class="flex flex-col items-center gap-2 mt-2">
+            <a href="{% url 'product_detail' product.id %}" class="w-full text-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded text-sm font-semibold shadow">
+              View Details
+            </a>
+            <a href="#"
+            class="w-full text-center bg-yellow-400 hover:bg-yellow-500 text-black px-4 py-2 rounded-lg text-sm font-semibold shadow-md transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg">
+           <i class="fas fa-shopping-cart mr-2"></i> Add to Cart
+         </a>
+          </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+
+
+  <!-- Footer -->
+  <footer class="text-center py-6 border-t border-[#21284a] text-[#8e99cc] text-sm">
+    &copy; 2025 Trendigo. All rights reserved.
+  </footer>
+
+</body>
+</html>

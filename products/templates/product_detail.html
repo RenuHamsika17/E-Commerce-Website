@@ -1,0 +1,132 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>{{ product.name }} | Trendigo</title>
+  <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Noto+Sans:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+</head>
+
+<body class="bg-[#101323] text-white font-['Inter','Noto Sans',sans-serif] min-h-screen flex flex-col">
+
+<!-- Header -->
+<header class="bg-[#141933] py-4 shadow">
+  <div class="container mx-auto flex flex-wrap justify-between items-center px-6 gap-y-4">
+    <div class="flex items-center text-2xl font-bold text-white gap-2">
+      <i class="fas fa-bag-shopping"></i>
+      <span>Trendigo</span>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-6">
+      <nav>
+        <ul class="flex space-x-6 text-white font-medium">
+          <li><a href="{% url 'home' %}" class="hover:text-gray-300">Home</a></li>
+          <li><a href="{% url 'categories' %}" class="hover:text-gray-300">Categories</a></li>
+          <li><a href="{% url 'products' %}" class="hover:text-gray-300">Products</a></li>
+          <li><a href="{% url 'about' %}" class="hover:text-gray-300">About</a></li>
+          <li><a href="{% url 'contact' %}" class="hover:text-gray-300">Contact</a></li>
+        </ul>
+      </nav>
+
+      <form action="{% url 'cart' %}" method="get">
+        <input type="text" name="q" placeholder="Search" class="bg-[#21284a] text-white rounded-lg px-4 py-2 text-sm w-48 placeholder:text-[#8e99cc]" />
+      </form>
+
+      <a href="{% url 'cart' %}" class="bg-[#21284a] p-2 rounded-lg">
+        <i class="fas fa-shopping-cart"></i>
+      </a>
+
+      <nav>
+        {% if user.is_authenticated %}
+          <a href="{% url 'dashboard' %}" class="text-white hover:underline">Dashboard</a>
+          <form method="post" action="{% url 'logout' %}" class="inline">{% csrf_token %}
+            <button type="submit" class="ml-4 text-red-400 hover:underline">Logout</button>
+          </form>
+        {% else %}
+          <a href="{% url 'login' %}" class="bg-[#607afb] px-4 py-2 rounded-lg text-sm font-bold hover:bg-[#4f67d4]">Login</a>
+        {% endif %}
+      </nav>
+    </div>
+  </div>
+</header>
+
+<!-- Product Section -->
+<div class="container mx-auto px-6 py-12">
+  <div class="flex flex-col lg:flex-row gap-10 bg-[#1e1f38] p-6 rounded-xl shadow-lg">
+
+    <!-- Image -->
+    <div class="w-full lg:w-1/2 bg-[#21284a] p-6 rounded-lg">
+      {% if product.image %}
+        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full object-contain rounded-lg" />
+      {% else %}
+        <img src="{% static 'images/default-product.jpg' %}" alt="No image" class="w-full object-contain rounded-lg" />
+      {% endif %}
+    </div>
+
+    <!-- Product Info -->
+    <div class="w-full lg:w-1/2 space-y-5">
+      <h2 class="text-3xl font-bold">{{ product.name }}</h2>
+      <p class="text-xl text-[#8ab4f8] font-semibold">₹{{ product.price }}</p>
+
+      <div class="text-[#cbd5e1] space-y-2">
+        <p><strong>Description:</strong></p>
+        <ul class="list-disc list-inside pl-4">
+          {% if product.description %}
+            {% for line in product.description.splitlines %}
+              {% if line %}<li>{{ line }}</li>{% endif %}
+            {% endfor %}
+          {% else %}
+            <li>No description available.</li>
+          {% endif %}
+        </ul>
+
+        {% if product.seller %}
+        <div class="bg-[#1e1f38] p-4 rounded-lg mt-6">
+          <h3 class="text-lg font-semibold mb-2">Seller Information</h3>
+          <p><strong>Seller:</strong> {{ product.seller }}</p>
+          {% if product.seller.shop_name %}<p><strong>Shop:</strong> {{ product.seller.shop_name }}</p>{% endif %}
+          {% if product.seller.contact_number %}<p><strong>Contact:</strong> {{ product.seller.contact_number }}</p>{% endif %}
+        </div>
+        {% else %}
+        <div class="bg-[#1e1f38] p-4 rounded-lg mt-6">
+          <h3 class="text-lg font-semibold mb-2">Seller Information</h3>
+          <p><strong>Seller:</strong> Trendigo Official</p>
+        </div>
+        {% endif %}
+
+        <p><strong>Availability:</strong>
+          {% if product.stock > 0 %}
+            <span class="text-green-400 font-semibold">{{ product.stock }} in stock</span>
+          {% else %}
+            <span class="text-red-400 font-semibold">Out of stock</span>
+          {% endif %}
+        </p>
+      </div>
+
+      <!-- Add to Cart Form -->
+      <form method="post" action="{% url 'add_to_cart' product.id %}" class="flex items-center gap-4 pt-4">
+        {% csrf_token %}
+        <label for="quantity" class="text-sm font-medium">Quantity:</label>
+        <input type="number" name="quantity" id="quantity" value="1" min="1" max="{{ product.stock }}" required class="border px-2 py-1 rounded w-20 text-black" />
+        <button type="submit" class="bg-yellow-400 hover:bg-yellow-500 text-black px-6 py-2 rounded-lg font-semibold transition duration-300">
+          <i class="fas fa-cart-plus mr-2"></i> Add to Cart
+        </button>
+      </form>
+
+      <a href="{% url 'category_page' product.category.id %}" class="inline-block mt-4 bg-gray-700 hover:bg-gray-800 text-white px-6 py-2 rounded-lg transition duration-300">
+        ← Back to Category
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="text-center py-6 border-t border-[#21284a] text-[#8e99cc] text-sm mt-auto">
+  &copy; 2025 Trendigo. All rights reserved.
+</footer>
+
+</body>
+</html>
